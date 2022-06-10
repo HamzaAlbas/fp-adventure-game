@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
@@ -7,6 +8,8 @@ public class PlayerController : MonoBehaviour
 
     public float walkingSpeed = 7.5f;
     public float runningSpeed = 11.5f;
+    public float stamina = 20f;
+    private float _speed;
     public float jumpSpeed = 8.0f;
     public float gravity = 20.0f;
     public Camera playerCamera;
@@ -24,6 +27,8 @@ public class PlayerController : MonoBehaviour
     private CharacterController _characterController;
     public Vector3 moveDirection = Vector3.zero;
     private float _rotationX;
+
+    public Slider slider;
 
     [HideInInspector]
     public bool canMove = true;
@@ -46,14 +51,29 @@ public class PlayerController : MonoBehaviour
         
         // Press Left Shift to run
         var isRunning = Input.GetKey(KeyCode.LeftShift);
-        var curSpeedX = canMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Vertical") : 0;
-        var curSpeedY = canMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Horizontal") : 0;
+
+        if (isRunning && stamina >= 0)
+        {
+            _speed = runningSpeed;
+            stamina -= Time.deltaTime;
+            slider.value = stamina;
+        }
+        else
+        {
+            _speed = walkingSpeed;
+        }
+        
+        Debug.Log(_speed);
+ 
+        
+        var curSpeedX = canMove ? (_speed) * Input.GetAxis("Vertical") : 0;
+        var curSpeedY = canMove ? (_speed) * Input.GetAxis("Horizontal") : 0;
         var movementDirectionY = moveDirection.y;
         moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
         if (Input.GetButton("Jump") && canMove && _characterController.isGrounded)
         {
-            //Jumped
+            // Jumped
             moveDirection.y = jumpSpeed;
             audioSource.Stop();
         }
@@ -90,6 +110,11 @@ public class PlayerController : MonoBehaviour
             if (!(_nextFootStep <= 0)) return;
             audioSource.PlayOneShot(_selected, 0.3f);
             _nextFootStep += footStepDelay;
+            if (stamina <= 10f && !isRunning)
+            {
+                stamina += Time.deltaTime * 10;
+                slider.value = stamina;
+            }
         }
         else if (curSpeedX is < 0 and >= -5f || curSpeedY is < 0 and >= -5f)
         {
@@ -100,6 +125,11 @@ public class PlayerController : MonoBehaviour
             if (!(_nextFootStep <= 0)) return;
             audioSource.PlayOneShot(_selected, 0.3f);
             _nextFootStep += footStepDelay;
+            if (stamina <= 10f && !isRunning)
+            {
+                stamina += Time.deltaTime * 10;
+                slider.value = stamina;
+            }
         }
         else if (curSpeedX > 5f || curSpeedY > 5f)
         {
@@ -125,6 +155,11 @@ public class PlayerController : MonoBehaviour
         {
             // Not walking
             audioSource.Stop();
+            if (stamina <= 10f && !isRunning)
+            {
+                stamina += Time.deltaTime;
+                slider.value = stamina;
+            }
         }
 
     }
