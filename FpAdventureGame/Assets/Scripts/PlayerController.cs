@@ -63,8 +63,6 @@ public class PlayerController : MonoBehaviour
             _speed = walkingSpeed;
         }
         
-        Debug.Log(_speed);
- 
         
         var curSpeedX = canMove ? (_speed) * Input.GetAxis("Vertical") : 0;
         var curSpeedY = canMove ? (_speed) * Input.GetAxis("Horizontal") : 0;
