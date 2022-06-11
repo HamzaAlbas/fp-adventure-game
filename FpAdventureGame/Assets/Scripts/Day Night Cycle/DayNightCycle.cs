@@ -72,7 +72,7 @@ public class DayNightCycle : MonoBehaviour
     private void UpdateTimeScale()
     {
         _timeScale = 25 / (targetDayLength / 60);
-        _timeScale *= timeCurve.Evaluate(timeOfDay);
+        _timeScale *= timeCurve.Evaluate(elapsedTime / (targetDayLength * 60));
         _timeScale /= _timeCurveNormalization;
     }
 
@@ -113,7 +113,20 @@ public class DayNightCycle : MonoBehaviour
         var hour = Mathf.FloorToInt(time * 24);
         var minute = Mathf.FloorToInt(((time * 24) - hour) * 60);
 
-        timeText.text = hour.ToString() + " : " + minute.ToString();
+        string hourString;
+        string minuteString;
+
+        if (hour < 10)
+            hourString = "0" + hour.ToString();
+        else
+            hourString = hour.ToString();
+        
+        if (minute < 10)
+            minuteString = "0" + minute.ToString();
+        else
+            minuteString = minute.ToString();
+        
+        timeText.text = hourString + " : " + minuteString;
 
         
     }
